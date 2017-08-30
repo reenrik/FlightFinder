@@ -8,12 +8,12 @@ namespace FlightFinder.Controllers
 {
     [Produces("application/json")]
     [Route("api/flight")]
-    public class FlightController : Controller
+    public class ApiFlightController : Controller
     {
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportRepository _airportRepository;
 
-        public FlightController(IFlightRepository flightRepository, IAirportRepository airportRepository)
+        public ApiFlightController(IFlightRepository flightRepository, IAirportRepository airportRepository)
         {
             _flightRepository = flightRepository;
             _airportRepository = airportRepository;
