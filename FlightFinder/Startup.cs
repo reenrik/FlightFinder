@@ -34,7 +34,14 @@ namespace FlightFinder
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseMvc();
+            app.UseStaticFiles();
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Flight}/{action=Index}/{id?}");
+            });
         }
     }
 }

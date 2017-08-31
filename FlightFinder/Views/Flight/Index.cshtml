@@ -1,0 +1,111 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">   
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/dataTables.jqueryui.min.css"> 
+</head>
+<body>
+<div class="jumbotron">
+    <h1>Flight Finder</h1>
+    <p>Select your departure and destination cities:</p>
+</div>
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+        <form class="form-inline" id="searchFlights">
+            <div class="form-group">
+                <label for="departureCity" class="col-sm-2 control-label">Departure: </label>
+                <div class="col-md-10">
+                    <select class="form-control" id="departureCity" name="departureCity"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="destinationCity" class="col-sm-2 control-label">Destination: </label>
+                <div class="col-md-10">
+                    <select class="form-control" id="destinationCity" name="destinationCity"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <button type="button" id="search" class="btn btn-primary">Go</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="searchResultsContainer" class="container-fluid">
+    <table id="searchResultsTable" class="display" cellspacing="0" width="100%"></table>
+</div>
+
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script type="text/javascript" charset="utf8"  src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/dataTables.jqueryui.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/dataRender/datetime.js"></script>    
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>       
+
+<script>
+    $(document).ready(function() {
+        var airportApi = 'api/flight/airports';
+        var searchApi = 'api/flight/search';
+
+        $.getJSON(airportApi)
+            .done(function(data) {
+                var depart = $('#departureCity');
+                var destination = $('#destinationCity');
+
+                var optionList;
+                $.each(data,
+                    function(i, item) {
+                        optionList += '<option value=' + item.code + '>' + item.name + '</option>';
+                    });
+
+                depart.append(optionList);
+                destination.append(optionList);
+            });
+
+        $('#search').click(function() {
+            $('#searchFlights').submit();
+        });
+
+         $('#searchResultsTable').DataTable({
+            "ajax": "",
+            "paging": false,
+            "searching": false,
+            "info": false,
+            "language": { "zeroRecords": "No flights to display" },
+            "sAjaxDataProp": "",
+            "columns": [
+                { "data": "from", "title": "Departure City" },
+                { "data": "to", "title": "Destination" },
+                { "data": "flightNumber", "title": "Flight Number" },
+                { "data": "departs", "title": "Departs", "render": $.fn.dataTable.render.moment('YYYY-MM-DDTH:mm:ss', 'h:mm a' ) },
+                { "data": "arrives", "title": "Arrives", "render": $.fn.dataTable.render.moment('YYYY-MM-DDTH:mm:ss', 'h:mm a') },
+                { "data": "mainCabinPrice", "title": "Coach Fare", "render": $.fn.dataTable.render.number(',', '.', 2, '$') },
+                { "data": "firstClassPrice", "title": "First Class Fare", "render": $.fn.dataTable.render.number(',', '.', 2, '$') }
+            ]
+        });
+
+        $('#searchFlights').on('submit',
+            function(event) {
+                event.preventDefault();
+                var form = $(this);
+                var departureCity = $('#departureCity', form).val();
+                var destinationCity = $('#destinationCity', form).val();
+                
+                var table = $('#searchResultsTable').DataTable();
+                table.clear();
+                table.ajax.url(searchApi + '/' + departureCity + '/' + destinationCity).load();
+            });
+    });
+</script>
+</body>
+</html>
