@@ -27,6 +27,17 @@ namespace FlightFinder
 
             services.AddScoped<IFlightRepository, FlightRepository>();
             services.AddScoped<IAirportRepository, AirportRepository>();
+
+            services.AddSwaggerGen(opts =>
+            {
+                opts.SwaggerDoc(
+                    "flight-finder-v1",
+                    new Swashbuckle.AspNetCore.Swagger.Info()
+                    {
+                        Version = "v1",
+                        Title = "FlightFinder"
+                    });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -41,6 +52,12 @@ namespace FlightFinder
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Flight}/{action=Index}/{id?}");
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/flight-finder-v1/swagger.json", "FlightFinder v1");
             });
         }
     }
