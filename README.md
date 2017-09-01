@@ -6,11 +6,11 @@ By default, the project will load up the UI at http://localhost:5444/flight, but
 
 Here are some highlights:
 
-UI Elements
+# UI Elements
 http://localhost:5444/flight - search UI
 http://localhost:5444/swagger - Swagger UI
 
-REST (HTTP GET)
+# REST (HTTP GET)
 http://localhost:5444/api/flight/airports - list of airports
 http://localhost:5444/api/flight - all flights
 http://localhost:5444/api/flight/{flightNumber}- flight by id
