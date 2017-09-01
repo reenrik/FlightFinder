@@ -1,4 +1,5 @@
-﻿using FlightFinder.Data;
+﻿using System.Security.Cryptography.X509Certificates;
+using FlightFinder.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,12 @@ namespace FlightFinder
 
             services.AddScoped<IFlightRepository, FlightRepository>();
             services.AddScoped<IAirportRepository, AirportRepository>();
+
+            var airportSettings = new ApplicationSettings { DataConnectionString = @"data/airports.csv", DataProvider = DataProviderType.CsvFileStore };
+            var flightSettings = new ApplicationSettings { DataConnectionString = @"data/flights.csv", DataProvider = DataProviderType.CsvFileStore };
+
+            services.AddScoped(x => new AirportsContext(airportSettings));
+            services.AddScoped(x => new FlightsContext(flightSettings));
 
             services.AddSwaggerGen(opts =>
             {

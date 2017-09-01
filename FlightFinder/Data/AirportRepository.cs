@@ -1,43 +1,40 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using CsvHelper;
 using FlightFinder.Models;
 
 namespace FlightFinder.Data
 {
     public class AirportRepository: IAirportRepository
     {
+        private readonly AirportsContext _airportsContext;
+        IEnumerable<Airport> _airports;
+
+        public AirportRepository(AirportsContext context)
+        {
+            _airportsContext = context;
+        }
+
+        protected IEnumerable<Airport> Airports => _airports ?? (_airports = _airportsContext.Set<Airport>());
+
         public Airport Get(string airportCode)
         {
-            Airport airport = this.GetAll().FirstOrDefault(a => string.Equals(a.Code, airportCode, StringComparison.CurrentCultureIgnoreCase));
-
-            return airport;
+            return Airports.FirstOrDefault(a => string.Equals(a.Code, airportCode, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public IEnumerable<Airport> GetAll()
         {
-            string filename = @"data/airports.csv";
-
-            IEnumerable<Airport> airports;
-            using (StreamReader sr = File.OpenText(filename))
-            {
-                CsvReader csvReader = new CsvReader(sr);
-                airports = csvReader.GetRecords<Airport>().ToList();
-            }
-
-            return airports;
+            return Airports;
         }
 
         public void Save(Airport entity)
         {
-            throw new System.NotSupportedException();
+            throw new NotSupportedException();
         }
 
         public void Delete(Airport entity)
         {
-            throw new System.NotSupportedException();
+            throw new NotSupportedException();
         }
     }
 }

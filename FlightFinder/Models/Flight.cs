@@ -1,8 +1,9 @@
 ﻿using System;
+using FlightFinder.Data;
 
 namespace FlightFinder.Models
 {
-    public class Flight
+    public class Flight : BaseEntity
     {
         public string From { get; set; }
         public string To { get; set; }

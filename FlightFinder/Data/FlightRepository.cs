@@ -1,37 +1,37 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using CsvHelper;
 using FlightFinder.Models;
 
 namespace FlightFinder.Data
 {
     public class FlightRepository: IFlightRepository
     {
+        private readonly FlightsContext _flightsContext;
+        IEnumerable<Flight> _flights;
+
+        public FlightRepository(FlightsContext context)
+        {
+            _flightsContext = context;
+        }
+
+        protected IEnumerable<Flight> Flights => _flights ?? (_flights = _flightsContext.Set<Flight>());
+
         public Flight Get(string flightNumber)
         {
-            Flight flight = this.GetAll().FirstOrDefault(a => a.FlightNumber == flightNumber);
+            Flight flight = Flights.FirstOrDefault(a => a.FlightNumber == flightNumber);
 
             return flight;
         }
 
         public IEnumerable<Flight> GetAll()
         {
-            string filename = @"data/flights.csv";
-
-            using (StreamReader sr = File.OpenText(filename))
-            {
-                CsvReader csvReader = new CsvReader(sr);
-                IEnumerable<Flight> flights = csvReader.GetRecords<Flight>().ToList();
-
-                return flights;
-            }
+            return Flights;
         }
 
         public IEnumerable<Flight> Search(string departureCity, string destinationCity)
         {
-            IEnumerable<Flight> flights = this.GetAll().Where(a => string.Equals(a.From, departureCity, StringComparison.CurrentCultureIgnoreCase) && String.Equals(a.To, destinationCity, StringComparison.CurrentCultureIgnoreCase));
+            IEnumerable<Flight> flights = Flights.Where(a => string.Equals(a.From, departureCity, StringComparison.CurrentCultureIgnoreCase) && String.Equals(a.To, destinationCity, StringComparison.CurrentCultureIgnoreCase));
 
             return flights;
         }
